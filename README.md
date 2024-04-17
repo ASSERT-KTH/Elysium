@@ -83,3 +83,12 @@ python3 elysium.py -s ../evaluation/datasets/SWC/SWC-112/proxy.sol -c Proxy --cf
 # Example patching transaction origin
 python3 elysium.py -s ../evaluation/datasets/SWC/SWC-115/mycontract.sol -c MyContract --cfg
 ```
+
+## Docker image
+Build the docker image and run it:
+```bash
+docker build -t elysium .
+docker run -it -v /var/run/docker.sock:/var/run/docker.sock elysium bash
+```
+
+Whilst inside the container, test the previous `Running Instructions`.
