@@ -92,3 +92,9 @@ docker run -it -v /var/run/docker.sock:/var/run/docker.sock elysium bash
 ```
 
 Whilst inside the container, test the previous `Running Instructions`.
+
+## Run elysium on Smartbugs-curated
+
+```bash
+docker run -v /var/run/docker.sock:/var/run/docker.sock -v path/to/smartbugs:/Elysium/smartbugs -v path/to/results:/Elysium/results elysium
+```
