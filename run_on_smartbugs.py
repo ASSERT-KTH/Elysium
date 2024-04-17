@@ -62,7 +62,6 @@ def main():
     with open(vuln_json, 'r') as file:
         data = json.load(file)
 
-    i = 0
     # Iterate over entries and call npm run dev
     for entry in data:
         path = smartbugs_dir + "/" + entry.get('path')
@@ -71,9 +70,6 @@ def main():
             process_entry(path, contract, output_dir)
         else:
             print("Invalid entry in JSON:", entry)
-        i += 1
-        if i==5:
-            break
         
 
 if __name__ == "__main__":
