@@ -18,7 +18,12 @@ WORKDIR /Elysium
 # Copy the Python application code
 COPY elysium elysium
 COPY evaluation evaluation
+COPY run_on_smartbugs.py run_on_smartbugs.py
+
+RUN mkdir smartbugs && mkdir results
 
 # Install dependencies
 RUN cd elysium && pip install -r requirements.txt
-RUN solc-select install 0.4.24 && solc-select use 0.4.24
+RUN solc-select install 0.4.26 && solc-select use 0.4.26
+
+CMD [ "python3", "run_on_smartbugs.py", "smartbugs", "results" ]

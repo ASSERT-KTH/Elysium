@@ -141,6 +141,7 @@ def get_access_control_information(backtrace, taint_analysis):
     return push_storage_location, push_address_mask, caller, sload
 
 def write_report_to_file(args, execution_start, report):
+    outdir = args.output_dir + "/" if args.output_dir else ""
     report["execution_time"] = time.time() - execution_start
     if args.output:
         with open(args.output + ".report.json", "w") as report_file:
@@ -148,13 +149,15 @@ def write_report_to_file(args, execution_start, report):
     else:
         if args.bytecode:
             filename, file_extension = os.path.splitext(args.bytecode)
-            with open(filename + ".report.json", "w") as report_file:
+            filename = filename.split("/")[-1]
+            with open(outdir + filename + ".report.json", "w") as report_file:
                 json.dump(report, report_file, indent=4)
         elif args.source_code:
-            with open(args.source_code.replace(".sol", ".report.json"), "w") as report_file:
+            filename = args.source_code.split("/")[-1]
+            with open(outdir + filename.replace(".sol", ".report.json"), "w") as report_file:
                 json.dump(report, report_file, indent=4)
         elif args.address:
-            with open(args.address + ".report.json", "w") as report_file:
+            with open(outdir + args.address + ".report.json", "w") as report_file:
                 json.dump(report, report_file, indent=4)
 
 def contains_deployment_bytecode(bytecode):

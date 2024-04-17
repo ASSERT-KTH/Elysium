@@ -55,6 +55,9 @@ def main():
         "-o", "--output", type=str, help="File where the patched bytecode should be saved")
 
     parser.add_argument(
+        "-O", "--output-dir", type=str, help="Directory where the everything should be saved")
+
+    parser.add_argument(
         "-i", "--inference", help="Only infer context: storage layout and integer types", action="store_true")
 
     parser.add_argument(
@@ -70,6 +73,7 @@ def main():
     bytecode = None
     deployment_bytecode = None
     deployed_bytecode = None
+    outdir = args.output_dir + "/" if args.output_dir else ""
 
     if args.bytecode:
         with open(args.bytecode) as f:
@@ -227,13 +231,15 @@ def main():
         else:
             if args.bytecode:
                 _, file_extension = os.path.splitext(args.bytecode)
-                with open(args.bytecode.replace(file_extension, ".bugs.json"), "w") as json_file:
+                filename = args.bytecode.rsplit('/', 1)[-1]
+                with open(outdir + filename.replace(file_extension, ".bugs.json"), "w") as json_file:
                     json.dump(detected_bugs, json_file, indent=4)
             elif args.source_code:
-                with open(args.source_code.replace(".sol", ".bugs.json"), "w") as json_file:
+                filename = args.source_code.rsplit('/', 1)[-1]
+                with open(outdir + filename.replace(".sol", ".bugs.json"), "w") as json_file:
                     json.dump(detected_bugs, json_file, indent=4)
             elif args.address:
-                with open(args.address+".bugs.json", "w") as json_file:
+                with open(outdir + args.address+".bugs.json", "w") as json_file:
                     json.dump(detected_bugs, json_file, indent=4)
 
     report = dict()
@@ -252,14 +258,16 @@ def main():
         if args.cfg:
             print("Exporting original control-flow graph...")
             if args.bytecode:
+                filename = args.bytecode.rsplit('/', 1)[-1]
                 if deployment_bytecode:
-                    export_cfg(CFG(deployment_bytecode), args.bytecode.rsplit('.', 1)[0]+".constructor.original", "pdf")
-                export_cfg(CFG(runtime_bytecode), args.bytecode.rsplit('.', 1)[0]+".original", "pdf")
+                    export_cfg(CFG(deployment_bytecode), outdir + filename.rsplit('.', 1)[0]+".constructor.original", "pdf")
+                export_cfg(CFG(runtime_bytecode), filename.rsplit('.', 1)[0]+".original", "pdf")
             elif args.source_code:
-                export_cfg(CFG(deployment_bytecode), args.source_code.replace(".sol", ".constructor.original"), "pdf")
-                export_cfg(CFG(runtime_bytecode), args.source_code.replace(".sol", ".original"), "pdf")
+                filename = args.source_code.rsplit('/', 1)[-1]
+                export_cfg(CFG(deployment_bytecode), outdir + filename.replace(".sol", ".constructor.original"), "pdf")
+                export_cfg(CFG(runtime_bytecode), outdir + filename.replace(".sol", ".original"), "pdf")
             elif args.address:
-                export_cfg(CFG(runtime_bytecode), args.address+".original", "pdf")
+                export_cfg(CFG(runtime_bytecode), outdir + args.address+".original", "pdf")
 
         try:
             print("Recovering control-flow graph...")
@@ -751,27 +759,31 @@ def main():
         else:
             if args.bytecode:
                 filename, file_extension = os.path.splitext(args.bytecode)
-                with open(filename + ".patched" + file_extension, "w") as file:
+                filename = filename.rsplit('/', 1)[-1]
+                with open(outdir + filename + ".patched" + file_extension, "w") as file:
                     file.write(patched_bytecode)
             elif args.source_code:
-                with open(args.source_code.replace(".sol", ".patched.bin"), "w") as file:
+                filename = args.source_code.rsplit('/', 1)[-1]
+                with open(outdir + filename.replace(".sol", ".patched.bin"), "w") as file:
                     file.write(patched_bytecode)
             elif args.address:
-                with open(args.address + ".patched.bin", "w") as file:
+                with open(outdir + args.address + ".patched.bin", "w") as file:
                     file.write(patched_bytecode)
 
         # Export control-flow graph
         if args.cfg:
             print("Exporting patched control-flow graph...")
             if args.bytecode:
+                filename = args.bytecode.rsplit('/', 1)[-1]
                 if deployment_bytecode:
-                    export_cfg(CFG(patched_deployment_bytecode), args.bytecode.rsplit('.', 1)[0]+".constructor.patched", "pdf")
-                export_cfg(CFG(patched_runtime_bytecode), args.bytecode.rsplit('.', 1)[0]+".patched", "pdf")
+                    export_cfg(CFG(patched_deployment_bytecode), outdir + filename.rsplit('.', 1)[0]+".constructor.patched", "pdf")
+                export_cfg(CFG(patched_runtime_bytecode), filename.rsplit('.', 1)[0]+".patched", "pdf")
             elif args.source_code:
-                export_cfg(CFG(patched_deployment_bytecode), args.source_code.replace(".sol", ".constructor.patched"), "pdf")
-                export_cfg(CFG(patched_runtime_bytecode), args.source_code.replace(".sol", ".patched"), "pdf")
+                filename = args.source_code.rsplit('/', 1)[-1]
+                export_cfg(CFG(patched_deployment_bytecode), outdir + filename.replace(".sol", ".constructor.patched"), "pdf")
+                export_cfg(CFG(patched_runtime_bytecode), outdir + filename.replace(".sol", ".patched"), "pdf")
             elif args.address:
-                export_cfg(CFG(patched_runtime_bytecode), args.address+".patched", "pdf")
+                export_cfg(CFG(patched_runtime_bytecode), outdir + args.address+".patched", "pdf")
 
     else:
         print("No bugs detected! There is nothing to be patched!")
@@ -783,13 +795,15 @@ def main():
         else:
             if args.bytecode:
                 filename, file_extension = os.path.splitext(args.bytecode)
-                with open(filename + ".patched" + file_extension, "w") as file:
+                filename = filename.rsplit('/', 1)[-1]
+                with open(outdir + filename + ".patched" + file_extension, "w") as file:
                     file.write(deployed_bytecode)
             elif args.source_code:
-                with open(args.source_code.replace(".sol", ".patched.bin"), "w") as file:
+                filename = args.source_code.rsplit('/', 1)[-1]
+                with open(outdir + filename.replace(".sol", ".patched.bin"), "w") as file:
                     file.write(deployed_bytecode)
             elif args.address:
-                with open(args.address + ".patched.bin", "w") as file:
+                with open(outdir + args.address + ".patched.bin", "w") as file:
                     file.write(deployed_bytecode)
 
     # Write report to file
