@@ -764,7 +764,7 @@ def main():
                     file.write(patched_bytecode)
             elif args.source_code:
                 filename = args.source_code.rsplit('/', 1)[-1]
-                with open(outdir + filename.replace(".sol", ".patched.bin"), "w") as file:
+                with open(outdir + filename.replace(".sol", ".bin"), "w") as file:
                     file.write(patched_bytecode)
             elif args.address:
                 with open(outdir + args.address + ".patched.bin", "w") as file:
@@ -800,7 +800,7 @@ def main():
                     file.write(deployed_bytecode)
             elif args.source_code:
                 filename = args.source_code.rsplit('/', 1)[-1]
-                with open(outdir + filename.replace(".sol", ".patched.bin"), "w") as file:
+                with open(outdir + filename.replace(".sol", ".bin"), "w") as file:
                     file.write(deployed_bytecode)
             elif args.address:
                 with open(outdir + args.address + ".patched.bin", "w") as file:
