@@ -137,6 +137,11 @@ def main():
     if deployed_bytecode:
         metadata = extract_metadata(deployed_bytecode)
         runtime_bytecode = remove_metadata(deployed_bytecode)
+        filename = args.source_code.rsplit('/', 1)[-1]
+        with open(outdir + filename.replace(".sol", ".dp.hex"), "w") as file:
+            file.write(deployed_bytecode)
+        with open(outdir + filename.replace(".sol", ".rt.hex"), "w") as file:
+            file.write(runtime_bytecode)
 
     if args.inference:
         print("Recovering control-flow graph...")
