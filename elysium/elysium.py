@@ -100,18 +100,25 @@ def main():
             if args.contract:
                 contract_name = args.contract
                 print("Retrieving bytecode for contract", "'"+contract_name+"'.")
-                bytecode = compilation_output["contracts"][contract_file][args.contract]["evm"]["bytecode"]["object"]
+                # bytecode = compilation_output["contracts"][contract_file][args.contract]["evm"]["bytecode"]["object"]
+                bytecode = compilation_output["contracts"][contract_file][contract_name]["evm"]["deployedBytecode"]["object"]
                 bytecode = replace_library_addresses(bytecode)
-                deployment_bytecode = extract_deployment_bytecode(bytecode)
-                deployed_bytecode = extract_deployed_bytecode(bytecode)
+                # deployment_bytecode = extract_deployment_bytecode(bytecode)
+                # deployed_bytecode = extract_deployed_bytecode(bytecode)
+                deployed_bytecode = bytecode
             elif len(compilation_output["contracts"][contract_file]) == 1:
                 for name in compilation_output["contracts"][contract_file]:
                     contract_name = name
                     print("Retrieving bytecode for contract", "'"+contract_name+"'.")
-                    bytecode = compilation_output["contracts"][contract_file][contract_name]["evm"]["bytecode"]["object"]
-                    bytecode = replace_library_addresses(bytecode)
-                    deployment_bytecode = extract_deployment_bytecode(bytecode)
-                    deployed_bytecode = extract_deployed_bytecode(bytecode)
+                    # bytecode = compilation_output["contracts"][contract_file][contract_name]["evm"]["bytecode"]["object"]
+                    bytecode = compilation_output["contracts"][contract_file][contract_name]["evm"]["deployedBytecode"]["object"]
+                    print("Bytecode...")
+                    print(bytecode)
+                    print()
+                    # bytecode = replace_library_addresses(bytecode)
+                    # deployment_bytecode = extract_deployment_bytecode(bytecode)
+                    # deployed_bytecode = extract_deployed_bytecode(bytecode)
+                    deployed_bytecode = bytecode
             else:
                 print("Source code file contains multiple contracts:")
                 for name in compilation_output["contracts"][contract_file]:
@@ -137,11 +144,11 @@ def main():
     if deployed_bytecode:
         metadata = extract_metadata(deployed_bytecode)
         runtime_bytecode = remove_metadata(deployed_bytecode)
-        filename = args.source_code.rsplit('/', 1)[-1]
-        with open(outdir + filename.replace(".sol", ".dp.hex"), "w") as file:
+        filenameTemp = args.source_code.rsplit('/', 1)[-1]
+        # with open(outdir + filename.replace(".sol", ".dp.hex"), "w") as file:
+        #     file.write(deployed_bytecode)
+        with open(outdir + filenameTemp.replace(".sol", ".rt.hex"), "w") as file:
             file.write(deployed_bytecode)
-        with open(outdir + filename.replace(".sol", ".rt.hex"), "w") as file:
-            file.write(runtime_bytecode)
 
     if args.inference:
         print("Recovering control-flow graph...")
@@ -269,7 +276,7 @@ def main():
                 export_cfg(CFG(runtime_bytecode), filename.rsplit('.', 1)[0]+".original", "pdf")
             elif args.source_code:
                 filename = args.source_code.rsplit('/', 1)[-1]
-                export_cfg(CFG(deployment_bytecode), outdir + filename.replace(".sol", ".constructor.original"), "pdf")
+                # export_cfg(CFG(deployment_bytecode), outdir + filename.replace(".sol", ".constructor.original"), "pdf")
                 export_cfg(CFG(runtime_bytecode), outdir + filename.replace(".sol", ".original"), "pdf")
             elif args.address:
                 export_cfg(CFG(runtime_bytecode), outdir + args.address+".original", "pdf")
@@ -785,7 +792,7 @@ def main():
                 export_cfg(CFG(patched_runtime_bytecode), filename.rsplit('.', 1)[0]+".patched", "pdf")
             elif args.source_code:
                 filename = args.source_code.rsplit('/', 1)[-1]
-                export_cfg(CFG(patched_deployment_bytecode), outdir + filename.replace(".sol", ".constructor.patched"), "pdf")
+                # export_cfg(CFG(patched_deployment_bytecode), outdir + filename.replace(".sol", ".constructor.patched"), "pdf")
                 export_cfg(CFG(patched_runtime_bytecode), outdir + filename.replace(".sol", ".patched"), "pdf")
             elif args.address:
                 export_cfg(CFG(patched_runtime_bytecode), outdir + args.address+".patched", "pdf")

@@ -83,11 +83,27 @@ def main():
     with open(vuln_json, 'r') as file:
         data = json.load(file)
 
-    # Iterate over entries and call npm run dev
+    # rerun = []
+    # # check if file exists
+    # if os.path.exists("results/results.csv"):
+    #     with open("results/results.csv", 'r') as csvfile:
+    #         reader = csv.reader(csvfile)
+    #         for row in reader:
+    #             if row[-1] == '-1':
+    #                 rerun.append(row[0])
+
+    # Iterate over entries
     for entry in data:
+        if entry.get('path') == "dataset/access_control/FibonacciBalance.sol" or entry.get('path') == "dataset/access_control/parity_wallet_bug_2.sol":
+            continue
         path = smartbugs_dir + "/" + entry.get('path')
+        # if path not in rerun:
+        #     print("Skipping", path)
+        #     continue
         contract = entry.get('contract_names')[0]
-        version = entry.get('pragma')
+        version = "0.4.24"
+        if entry.get('path') == "dataset/access_control/parity_wallet_bug_1.sol":
+            version = "0.4.9"
         if path and contract:
             process_entry(path, contract, output_dir, version)
         else:
